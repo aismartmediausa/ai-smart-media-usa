@@ -262,42 +262,48 @@ async function exportVideo(){
  if(!clips.length){$('exportStatus').textContent='Please add photos or video clips first.';return;}
  if(!canvas.captureStream||!window.MediaRecorder){$('exportStatus').textContent='Video export is not supported in this browser. Try the latest Chrome browser.';return;}
  $('exportBtn').disabled=true;$('downloadBtn').disabled=true;exportBlob=null;
- let stream=null,audioCtx=null,musicEl=null,voiceEl=null;
+ let stream=null,audioCtx=null,musicEl=null,voiceEl=null,framePump=null;
  try{
-  drawSelected();stream=canvas.captureStream(30);
+  const paint=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);drawBackground();const c=clips[selected];if(c&&c.type==='image'&&c.el&&c.el.complete&&c.el.naturalWidth>0)fitDraw(c.el,canvas.width,canvas.height);else if(c&&c.type==='video'&&c.el&&c.el.readyState>=2)fitDraw(c.el,canvas.width,canvas.height);drawOverlay();};
+  paint();stream=canvas.captureStream(0);
+  const videoTrack=stream.getVideoTracks()[0];
+  const requestFrame=()=>{if(videoTrack&&typeof videoTrack.requestFrame==='function')videoTrack.requestFrame()};
+  requestFrame();
+  framePump=setInterval(requestFrame,1000/15);
   if(musicUrl||voiceUrl){
    audioCtx=new (window.AudioContext||window.webkitAudioContext)();const dest=audioCtx.createMediaStreamDestination();
    if(musicUrl){musicEl=new Audio(musicUrl);musicEl.loop=true;const src=audioCtx.createMediaElementSource(musicEl);const gain=audioCtx.createGain();gain.gain.value=.2;src.connect(gain);gain.connect(dest);}
    if(voiceUrl){voiceEl=new Audio(voiceUrl);const src=audioCtx.createMediaElementSource(voiceEl);src.connect(dest);}
    dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));await audioCtx.resume();
   }
-  const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
-  if(!mime)throw new Error('This browser cannot record WebM video.');
-  const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:4500000}),chunks=[];
+  const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
+  if(!mime)throw new Error('WebM recording is not supported by this browser.');
+  const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000}),chunks=[];
   recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   const done=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=()=>reject(new Error('Recording failed.'))});
-  recorder.start(500);if(musicEl)await musicEl.play().catch(()=>{});if(voiceEl)await voiceEl.play().catch(()=>{});
-  const drawFrame=media=>{ctx.clearRect(0,0,canvas.width,canvas.height);fitDraw(media,canvas.width,canvas.height);drawOverlay();};
+  recorder.start(250);await new Promise(r=>setTimeout(r,500));requestFrame();
+  if(musicEl)await musicEl.play().catch(()=>{});if(voiceEl)await voiceEl.play().catch(()=>{});
   for(let i=0;i<clips.length;i++){
    selected=i;updateList();const c=clips[i];$('exportStatus').textContent='Rendering scene '+(i+1)+' of '+clips.length+'…';
-   if(c.type==='video'){
+   if(c.type==='image'){
+    if(!c.el||!c.el.complete||!c.el.naturalWidth)await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{c.el=im;resolve()};im.onerror=()=>reject(new Error('Could not load image '+c.name));im.src=c.url});
+    paint();requestFrame();await new Promise(r=>setTimeout(r,Math.max(1,Number($('duration').value)||4)*1000));
+   }else if(c.type==='video'){
     const v=document.createElement('video');v.src=c.url;v.playsInline=true;v.muted=true;v.preload='auto';
     await new Promise((resolve,reject)=>{v.onloadeddata=resolve;v.onerror=()=>reject(new Error('Could not read video '+c.name));v.load()});
     const duration=Math.min(Math.max(v.duration||4,1),90);await v.play().catch(()=>{});
-    await new Promise(resolve=>{const start=performance.now();const frame=()=>{if(v.readyState>=2)drawFrame(v);if(v.ended||performance.now()-start>=duration*1000){v.pause();resolve()}else requestAnimationFrame(frame)};frame()});
+    await new Promise(resolve=>{const start=performance.now();const frame=()=>{if(v.readyState>=2){ctx.clearRect(0,0,canvas.width,canvas.height);fitDraw(v,canvas.width,canvas.height);drawOverlay();requestFrame()}if(v.ended||performance.now()-start>=duration*1000){v.pause();resolve()}else requestAnimationFrame(frame)};frame()});
     v.pause();v.removeAttribute('src');v.load();
-   }else{
-    if(c.type==='image'&&c.el&&c.el.complete&&c.el.naturalWidth>0)drawFrame(c.el);
-    else{ctx.clearRect(0,0,canvas.width,canvas.height);drawBackground();drawOverlay()}
-    await new Promise(resolve=>setTimeout(resolve,Math.max(1,Number($('duration').value)||4)*1000));
-   }
+   }else{paint();requestFrame();await new Promise(r=>setTimeout(r,4000))}
   }
-  if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();recorder.stop();await done;
-  exportBlob=new Blob(chunks,{type:mime});const url=URL.createObjectURL(exportBlob);
+  if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();await new Promise(r=>setTimeout(r,300));recorder.stop();await done;
+  if(framePump){clearInterval(framePump);framePump=null}
+  exportBlob=new Blob(chunks,{type:mime});if(!exportBlob.size)throw new Error('The browser created an empty video. Please try Chrome again.');
+  const url=URL.createObjectURL(exportBlob);
   $('downloadBtn').disabled=false;$('downloadBtn').onclick=()=>{const link=document.createElement('a');link.href=url;link.download='AI-SMART-MEDIA-USA-video.webm';document.body.appendChild(link);link.click();link.remove()};
-  $('exportStatus').textContent='Export ready. Tap Download export to save your video.';
+  $('exportStatus').textContent='Export ready ('+Math.round(exportBlob.size/1024)+' KB). Tap Download export to save your video.';
  }catch(err){$('exportStatus').textContent='Export issue: '+err.message+' Try fewer clips or a shorter video.'}
- finally{if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();if(audioCtx)audioCtx.close();if(stream)stream.getTracks().forEach(t=>t.stop());$('exportBtn').disabled=false;drawSelected()}
+ finally{if(framePump)clearInterval(framePump);if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();if(audioCtx)audioCtx.close();if(stream)stream.getTracks().forEach(t=>t.stop());$('exportBtn').disabled=false;drawSelected()}
 }
 $('exportBtn').onclick=exportVideo;
 function openNewsSearch(){const q=[$('trendCategory').value,$('trendRegion').value,$('trendNotes').value.trim()].filter(Boolean).join(' ');if(!q){$('trendBrief').textContent='Pehle topic enter kijiye.';return;}window.open('https://news.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');}
