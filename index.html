@@ -259,51 +259,39 @@ $('voiceInput').onchange=e=>{if(voiceUrl)URL.revokeObjectURL(voiceUrl);const f=e
 $('musicInput').onchange=e=>{if(musicUrl)URL.revokeObjectURL(musicUrl);const f=e.target.files[0];musicUrl=f?URL.createObjectURL(f):null;$('exportStatus').textContent=f?'Music selected: '+f.name:'No music selected.'};
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 async function exportVideo(){
- if(!clips.length){$('exportStatus').textContent='Please add photos or video clips first.';return;}
- if(!canvas.captureStream||!window.MediaRecorder){$('exportStatus').textContent='Video export is not supported in this browser. Try the latest Chrome browser.';return;}
+ if(!clips.length){$('exportStatus').textContent='Add photos or videos first.';return;}
+ if(!canvas.captureStream||!window.MediaRecorder){$('exportStatus').textContent='This browser cannot export video. Use updated Chrome.';return;}
  $('exportBtn').disabled=true;$('downloadBtn').disabled=true;exportBlob=null;
- let stream=null,audioCtx=null,musicEl=null,voiceEl=null,framePump=null;
+ let stream=null,rec=null,raf=0;
  try{
-  const paint=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);drawBackground();const c=clips[selected];if(c&&c.type==='image'&&c.el&&c.el.complete&&c.el.naturalWidth>0)fitDraw(c.el,canvas.width,canvas.height);else if(c&&c.type==='video'&&c.el&&c.el.readyState>=2)fitDraw(c.el,canvas.width,canvas.height);drawOverlay();};
-  paint();stream=canvas.captureStream(30);
-  const videoTrack=stream.getVideoTracks()[0];
-  const requestFrame=()=>{if(videoTrack&&typeof videoTrack.requestFrame==='function')videoTrack.requestFrame()};
-  requestFrame();
-  framePump=setInterval(requestFrame,1000/15);
-  if(musicUrl||voiceUrl){
-   audioCtx=new (window.AudioContext||window.webkitAudioContext)();const dest=audioCtx.createMediaStreamDestination();
-   if(musicUrl){musicEl=new Audio(musicUrl);musicEl.loop=true;const src=audioCtx.createMediaElementSource(musicEl);const gain=audioCtx.createGain();gain.gain.value=.2;src.connect(gain);gain.connect(dest);}
-   if(voiceUrl){voiceEl=new Audio(voiceUrl);const src=audioCtx.createMediaElementSource(voiceEl);src.connect(dest);}
-   dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));await audioCtx.resume();
-  }
-  const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
-  if(!mime)throw new Error('WebM recording is not supported by this browser.');
-  const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000}),chunks=[];
-  recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-  const done=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=()=>reject(new Error('Recording failed.'))});
-  recorder.start(250);await new Promise(r=>setTimeout(r,500));requestFrame();
-  if(musicEl)await musicEl.play().catch(()=>{});if(voiceEl)await voiceEl.play().catch(()=>{});
+  drawSelected();await wait(250);
+  stream=canvas.captureStream(30);
+  const track=stream.getVideoTracks()[0];
+  const mime=['video/webm;codecs=vp8','video/webm;codecs=vp9','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));
+  if(!mime)throw new Error('WebM format is not supported on this phone.');
+  const chunks=[];rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000});
+  rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  const done=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=()=>reject(new Error('Recorder failed'))});
+  rec.start(250);
+  const keepAlive=()=>{if(track&&track.requestFrame)track.requestFrame();raf=requestAnimationFrame(keepAlive)};keepAlive();
   for(let i=0;i<clips.length;i++){
-   selected=i;updateList();const c=clips[i];$('exportStatus').textContent='Rendering scene '+(i+1)+' of '+clips.length+'…';
+   selected=i;updateList();const c=clips[i];$('exportStatus').textContent='Rendering '+(i+1)+' / '+clips.length;
    if(c.type==='image'){
-    if(!c.el||!c.el.complete||!c.el.naturalWidth)await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{c.el=im;resolve()};im.onerror=()=>reject(new Error('Could not load image '+c.name));im.src=c.url});
-    paint();requestFrame();await new Promise(r=>setTimeout(r,Math.max(1,Number($('duration').value)||4)*1000));
+    if(!c.el||!c.el.complete||!c.el.naturalWidth)await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{c.el=im;resolve()};im.onerror=()=>reject(new Error('Image load failed: '+c.name));im.src=c.url});
+    drawSelected();if(track&&track.requestFrame)track.requestFrame();await wait(Math.max(1,Number($('duration').value)||4)*1000);
    }else if(c.type==='video'){
-    const v=document.createElement('video');v.src=c.url;v.playsInline=true;v.muted=true;v.preload='auto';
-    await new Promise((resolve,reject)=>{v.onloadeddata=resolve;v.onerror=()=>reject(new Error('Could not read video '+c.name));v.load()});
-    const duration=Math.min(Math.max(v.duration||4,1),90);await v.play().catch(()=>{});
-    await new Promise(resolve=>{const start=performance.now();const frame=()=>{if(v.readyState>=2){ctx.clearRect(0,0,canvas.width,canvas.height);fitDraw(v,canvas.width,canvas.height);drawOverlay();requestFrame()}if(v.ended||performance.now()-start>=duration*1000){v.pause();resolve()}else requestAnimationFrame(frame)};frame()});
+    const v=document.createElement('video');v.src=c.url;v.muted=true;v.playsInline=true;v.preload='auto';
+    await new Promise((resolve,reject)=>{v.onloadeddata=resolve;v.onerror=()=>reject(new Error('Video load failed: '+c.name));v.load()});
+    await v.play();await new Promise(resolve=>{const draw=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);fitDraw(v,canvas.width,canvas.height);drawOverlay();if(track&&track.requestFrame)track.requestFrame();if(v.ended)resolve();else requestAnimationFrame(draw)};draw()});
     v.pause();v.removeAttribute('src');v.load();
-   }else{paint();requestFrame();await new Promise(r=>setTimeout(r,4000))}
+   }else{drawBackground();drawOverlay();await wait(3500)}
   }
-  if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();await new Promise(r=>setTimeout(r,300));recorder.stop();await done;
-  if(framePump){clearInterval(framePump);framePump=null}
-  exportBlob=new Blob(chunks,{type:mime});if(!exportBlob.size)throw new Error('The browser created an empty video. Please try Chrome again.');
-  const url=URL.createObjectURL(exportBlob);
-  $('downloadBtn').disabled=false;$('downloadBtn').onclick=()=>{const link=document.createElement('a');link.href=url;link.download='AI-SMART-MEDIA-USA-video.webm';document.body.appendChild(link);link.click();link.remove()};
-  $('exportStatus').textContent='Export ready ('+Math.round(exportBlob.size/1024)+' KB). Tap Download export to save your video.';
- }catch(err){$('exportStatus').textContent='Export issue: '+err.message+' Try fewer clips or a shorter video.'}
- finally{if(framePump)clearInterval(framePump);if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();if(audioCtx)audioCtx.close();if(stream)stream.getTracks().forEach(t=>t.stop());$('exportBtn').disabled=false;drawSelected()}
+  await wait(500);cancelAnimationFrame(raf);raf=0;rec.stop();await done;
+  exportBlob=new Blob(chunks,{type:mime});if(!exportBlob.size)throw new Error('Export file is empty.');
+  const url=URL.createObjectURL(exportBlob);$('downloadBtn').disabled=false;$('downloadBtn').onclick=()=>{const link=document.createElement('a');link.href=url;link.download='AI-SMART-MEDIA-USA-video.webm';document.body.appendChild(link);link.click();link.remove()};
+  $('exportStatus').textContent='Video ready ('+Math.round(exportBlob.size/1024)+' KB). Tap Download export.';
+ }catch(e){$('exportStatus').textContent='Export failed: '+e.message}
+ finally{cancelAnimationFrame(raf);if(stream)stream.getTracks().forEach(t=>t.stop());$('exportBtn').disabled=false;drawSelected()}
 }
 $('exportBtn').onclick=exportVideo;
 function openNewsSearch(){const q=[$('trendCategory').value,$('trendRegion').value,$('trendNotes').value.trim()].filter(Boolean).join(' ');if(!q){$('trendBrief').textContent='Pehle topic enter kijiye.';return;}window.open('https://news.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');}
