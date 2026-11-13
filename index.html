@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071225">
+<title>AI SMART MEDIA — International Video Studio</title>
+<style>
+:root{--bg:#07101f;--panel:#101d31;--panel2:#14243c;--line:#263b5c;--text:#f4f7ff;--muted:#9fb0ca;--blue:#2785ff;--red:#ef3340;--cyan:#49d7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0%,#142b50 0,#07101f 42%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+header{padding:16px clamp(14px,4vw,36px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#07101feF;position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:12px}.mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--blue),#142d69 55%,var(--red));display:grid;place-items:center;font-weight:900;font-size:20px;box-shadow:0 0 22px #2785ff55}.brand strong{display:block;letter-spacing:.06em}.brand small{color:var(--muted)}
+.pill{border:1px solid #34557d;border-radius:999px;padding:7px 12px;color:#bcd5ff;font-size:12px}
+main{max-width:1200px;margin:auto;padding:22px clamp(12px,3vw,28px) 50px}
+.hero{padding:20px 0 16px}.eyebrow{color:#65baff;text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:11px}.hero h1{font-size:clamp(26px,5vw,42px);line-height:1.08;margin:8px 0}.hero p{color:var(--muted);max-width:720px;margin:8px 0}
+.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.8fr);gap:18px;align-items:start}
+.panel{background:linear-gradient(180deg,#12213a,#0d192c);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 16px 40px #0003;margin-bottom:16px}
+.panel h2{font-size:17px;margin:0 0 12px}.panel h3{font-size:14px;margin:16px 0 8px;color:#dbe8ff}
+.preview-wrap{background:#030813;border:1px solid #294366;border-radius:14px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;max-height:520px;object-fit:contain;background:#050b16}
+.preview-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 12px;color:var(--muted);font-size:12px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+button,.filebtn{border:0;border-radius:11px;padding:11px 14px;font-weight:750;cursor:pointer;background:linear-gradient(135deg,#318dff,#1761d6);color:white;min-height:42px}
+button.secondary,.filebtn.secondary{background:#1a2b45;border:1px solid #345174;color:#dceaff}
+button.danger{background:#54232e;border:1px solid #9d3444;color:#ffdce1}
+button:disabled{opacity:.45;cursor:not-allowed}
+label{display:block;color:#c6d5eb;font-size:12px;font-weight:700;margin:11px 0 5px}
+input[type=text],textarea,select{width:100%;border-radius:10px;border:1px solid #304968;background:#091629;color:var(--text);padding:11px;font:inherit;outline:none}
+textarea{min-height:100px;resize:vertical}
+input[type=file]{width:100%;color:var(--muted);font-size:12px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.hint{font-size:12px;color:var(--muted);margin:7px 0}
+.cliplist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.clip{display:flex;align-items:center;gap:9px;padding:9px;background:#0a1729;border:1px solid #263d5b;border-radius:11px}
+.thumb{width:54px;height:42px;border-radius:7px;background:#1c3557;display:grid;place-items:center;overflow:hidden;color:#8fcaff;font-size:11px;flex-shrink:0}
+.thumb img{width:100%;height:100%;object-fit:cover}.clipinfo{min-width:0;flex:1}.clipinfo b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.clipinfo small{color:var(--muted);font-size:11px}
+.clip button{padding:6px 9px;min-height:32px;font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.kpi{background:#0a1729;border:1px solid #263d5b;border-radius:10px;padding:9px}.kpi b{display:block;font-size:16px}.kpi small{color:var(--muted);font-size:10px}
+.notice{padding:11px 12px;border-radius:11px;background:#172a45;border:1px solid #35567d;color:#c8dcfa;font-size:12px;margin-top:12px}
+.status{font-size:12px;color:#a9d8ff;min-height:18px;margin-top:8px}
+footer{max-width:1200px;margin:auto;padding:0 20px 30px;color:var(--muted);font-size:11px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.brand small{display:none}.panel{padding:13px}.hero{padding-top:12px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="mark">AI</div><div><strong>AI SMART MEDIA</strong><small>International Creator Studio · Video workspace</small></div></div>
+ <span class="pill">PHONE FRIENDLY · STUDIO V2</span>
+</header>
+<main>
+ <section class="hero">
+  <div class="eyebrow">AI production command center · Plan · Create · Review · Schedule</div>
+  <h1>Your AI-powered media workspace</h1>
+  <p>One workspace for trend planning, scripts, voice, editing, captions, thumbnails and YouTube publishing preparation. External AI and YouTube connections are clearly marked until securely connected.</p>
+ </section>
+
+ <section class="panel" style="margin-bottom:18px">
+  <h2>00 · Production command center</h2>
+  <p class="hint">Your requested workflow: research → script → voice → scenes → edit → thumbnail → review → schedule. This dashboard keeps each stage together.</p>
+  <div class="kpis"><div class="kpi"><b>01 · Research</b><small>Trend sources connection needed</small></div><div class="kpi"><b>02 · Create</b><small>Script, voice, scenes, edit</small></div><div class="kpi"><b>03 · Publish</b><small>YouTube authorization needed</small></div></div>
+  <div class="notice"><b>Important:</b> This browser website currently edits local media and exports WebM. Live trend feeds, cloud AI video generation, natural female TTS, cloud rendering and automatic YouTube upload need secure server/API connections. They are not falsely shown as active.</div>
+ </section>
+ <div class="layout" style="margin-bottom:18px">
+  <section>
+   <div class="panel">
+    <h2>08 · Trending topic desk</h2>
+    <label for="trendCategory">Research category</label>
+    <select id="trendCategory"><option>AI & Technology</option><option>World News</option><option>Science & Space</option><option>Business & Economy</option><option>Education</option><option>Health & Research</option><option>Environment & Energy</option><option>Gaming & Digital Culture</option><option>Travel & Lifestyle</option><option>All major trends</option></select>
+    <label for="trendRegion">Audience / region</label><select id="trendRegion"><option>USA</option><option>India</option><option>Worldwide</option></select>
+    <label for="trendNotes">Topic or trend notes</label><textarea id="trendNotes" placeholder="Paste a trend, headline, or topic to turn into a video plan..."></textarea>
+    <button id="trendPlanBtn" style="width:100%;margin-top:8px">Prepare topic brief</button>
+    <p class="hint">This prepares a planning brief from your input. Live Google/YouTube/news trend discovery requires connecting data sources.</p>
+    <div id="trendBrief" class="notice" aria-live="polite">No topic brief prepared yet.</div>
+   </div>
+   <div class="panel">
+    <h2>09 · Video package checklist</h2>
+    <div id="packageChecks" class="hint">Use this checklist before publishing. Tick items as they are completed.</div>
+    <label><input type="checkbox" class="pkg"> Topic verified with reliable sources</label>
+    <label><input type="checkbox" class="pkg"> Script checked for accuracy and originality</label>
+    <label><input type="checkbox" class="pkg"> Female voice narration reviewed</label>
+    <label><input type="checkbox" class="pkg"> Licensed / permitted music selected</label>
+    <label><input type="checkbox" class="pkg"> Captions and spelling reviewed</label>
+    <label><input type="checkbox" class="pkg"> Thumbnail and title reviewed</label>
+    <label><input type="checkbox" class="pkg"> Final video preview approved</label>
+    <div class="status" id="checkStatus">0 of 7 checks complete.</div>
+   </div>
+  </section>
+  <aside>
+   <div class="panel">
+    <h2>10 · Voice and AI service connections</h2>
+    <p class="hint">Preferred narration: Natural-sounding Female · American English · conversational presenter · gentle pauses.</p>
+    <div class="notice">Female voice generation: <b>Not connected</b><br>AI script generation: <b>Not connected</b><br>AI scene generation: <b>Not connected</b><br>Trend data feeds: <b>Not connected</b></div>
+    <p class="hint">No paid plan or recharge is required just to use this page. Any third-party free quota or paid usage must be checked before enabling a service. Never paste API keys into this public page.</p>
+   </div>
+   <div class="panel">
+    <h2>11 · YouTube publishing desk</h2>
+    <label for="ytTitle">Video title</label><input id="ytTitle" type="text" maxlength="100" placeholder="Enter final YouTube title">
+    <label for="ytDescription">Description</label><textarea id="ytDescription" placeholder="Video description and source links"></textarea>
+    <label for="ytTags">Tags (comma separated)</label><input id="ytTags" type="text" placeholder="AI, technology, news">
+    <label for="publishTime">Preferred upload time (India time)</label><input id="publishTime" type="time" value="18:30">
+    <label for="publishDays">Publishing frequency</label><select id="publishDays"><option>1 Short + 1 long video daily</option><option>1 video daily</option><option>3 videos per week</option><option>Custom schedule</option></select>
+    <button id="savePlanBtn" style="width:100%;margin-top:8px">Save publishing plan on this device</button>
+    <div id="planStatus" class="status">No publishing plan saved.</div>
+    <p class="hint">This saves your plan in this browser only. Actual scheduled uploads require YouTube OAuth/API approval and a secure backend. Nothing uploads from this page yet.</p>
+   </div>
+  </aside>
+ </div>
+ <div class="layout">
+  <section>
+   <div class="panel">
+    <h2>01 · Video preview</h2>
+    <div class="preview-wrap"><canvas id="stage" width="1280" height="720"></canvas><div class="preview-meta"><span id="ratioLabel">16:9 · Landscape</span><span id="clipCount">0 media items</span></div></div>
+    <div class="row" style="margin-top:10px">
+      <button class="secondary" id="prevBtn">← Previous</button>
+      <button class="secondary" id="nextBtn">Next →</button>
+      <button id="previewBtn">Preview selected</button>
+    </div>
+    <div class="status" id="status">Add photos or video clips to begin.</div>
+   </div>
+   <div class="panel">
+    <h2>02 · Your media timeline</h2>
+    <label for="mediaInput">Add photos and video clips</label>
+    <input id="mediaInput" type="file" accept="image/*,video/*" multiple>
+    <p class="hint">Select multiple files. Your media stays on this device; it is not uploaded to a server.</p>
+    <div class="cliplist" id="clipList"><div class="hint">No media added yet.</div></div>
+    <div class="row" style="margin-top:10px"><button class="secondary" id="clearBtn">Clear timeline</button><button class="secondary" id="addCardBtn">Add title card</button></div>
+   </div>
+   <div class="panel">
+    <h2>03 · Export video</h2>
+    <div class="row">
+     <div><label for="ratio">Video format</label><select id="ratio"><option value="landscape">16:9 · YouTube</option><option value="portrait">9:16 · Shorts</option><option value="square">1:1 · Square</option></select></div>
+     <div><label for="duration">Photo duration</label><select id="duration"><option value="3">3 seconds</option><option value="4" selected>4 seconds</option><option value="5">5 seconds</option><option value="7">7 seconds</option></select></div>
+    </div>
+    <div class="row" style="margin-top:12px"><button id="exportBtn">Export video</button><button class="secondary" id="downloadBtn" disabled>Download export</button></div>
+    <div class="status" id="exportStatus">Export is created in WebM format when supported by your browser.</div>
+    <div class="notice">Tip: Keep this page open while exporting. Longer videos and high-resolution clips may take time on a phone.</div>
+   </div>
+  </section>
+  <aside>
+   <div class="panel">
+    <h2>04 · Story & captions</h2>
+    <label for="headline">Main headline</label><input id="headline" type="text" maxlength="90" value="HOW AI IS CHANGING THE WORLD">
+    <label for="caption">Caption / on-screen text</label><textarea id="caption" maxlength="400" placeholder="Type the words you want viewers to see...">Artificial Intelligence is changing how we learn, work, and create.</textarea>
+    <label for="brandText">Brand line</label><input id="brandText" type="text" maxlength="70" value="AI SMART MEDIA USA">
+    <div class="row" style="margin-top:10px"><button class="secondary" id="applyTextBtn">Update preview</button><button class="secondary" id="clearTextBtn">Clear text</button></div>
+   </div>
+   <div class="panel">
+    <h2>05 · Script assistant</h2>
+    <label for="topic">Video topic</label><input id="topic" type="text" value="How Artificial Intelligence Is Changing the World in 2026">
+    <label for="script">Your video script</label><textarea id="script">Welcome to AI Smart Media USA. Artificial Intelligence is changing the world. From education and healthcare to business and creative work, AI tools are helping people work with information in new ways. But responsible use matters. We need to protect privacy, check information, and keep human judgment involved. Follow AI Smart Media USA for more technology updates.</textarea>
+    <button id="scriptBtn" style="width:100%;margin-top:9px">Create starter script</button>
+    <p class="hint">This creates an editable starter draft from a template. Live AI writing requires connecting a secure AI service.</p>
+   </div>
+   <div class="panel">
+    <h2>06 · Channel, voice & subtitles</h2>
+    <label for="channelProfile">Choose channel</label>
+    <select id="channelProfile"><option value="usa">USA Channel · English voice</option><option value="india">India Channel · Hindi voice</option></select>
+    <label for="voiceLocale">Narration language</label>
+    <select id="voiceLocale"><option value="en-US">English (United States)</option><option value="hi-IN">Hindi (India)</option></select>
+    <label for="voiceStyle">Voice style</label>
+    <select id="voiceStyle"><option value="female">Female · warm and friendly</option><option value="male">Male · clear and confident</option><option value="any">Use device default voice</option></select>
+    <label for="voiceChoice">Available voice on this device</label>
+    <select id="voiceChoice"><option value="">Device default (load available voices)</option></select>
+    <p class="hint">Available voices depend on your phone/browser. Preview only; generated narration must be recorded or added as an audio file before export.</p>
+    <label for="subtitleLanguage">Subtitle language</label>
+    <select id="subtitleLanguage">
+      <option value="en">English</option><option value="hi">Hindi</option><option value="es">Spanish</option><option value="fr">French</option><option value="ar">Arabic</option><option value="pt">Portuguese</option><option value="ja">Japanese</option><option value="de">German</option><option value="zh">Chinese</option><option value="bn">Bengali</option><option value="other">Other language</option>
+    </select>
+    <label for="subtitleText">Subtitle text (translated text for selected language)</label>
+    <textarea id="subtitleText" rows="3" placeholder="Paste or write subtitles in the selected language. These will appear on the exported video."></textarea>
+    <p class="hint">USA: English voice with selectable translated subtitles. India: Hindi voice with English subtitles. Translation is not automatic yet; enter reviewed translated text here.</p>
+    <div class="row"><button class="secondary" id="applyProfileBtn">Apply channel settings</button><button class="secondary" id="clearSubtitleBtn">Clear subtitles</button></div>
+  </div>
+  <div class="panel">
+    <h2>07 · Voice & music</h2>
+    <label for="voiceText">Text-to-speech preview</label><textarea id="voiceText" rows="3">Welcome to AI Smart Media USA. Your source for technology and global media updates.</textarea>
+    <div class="row"><button id="speakBtn">▶ Preview voice</button><button class="secondary" id="stopSpeakBtn">Stop</button></div>
+    <label for="voiceInput">Add recorded narration / voice-over (optional)</label><input id="voiceInput" type="file" accept="audio/*">
+    <p class="hint">Choose an audio recording of your narration to include it in the exported video. Browser text-to-speech preview alone cannot be embedded reliably.</p>
+    <label for="musicInput">Add background music (optional)</label><input id="musicInput" type="file" accept="audio/*">
+    <p class="hint">Narration and background music are mixed into the exported WebM video. Use music you have permission to use.</p>
+   </div>
+  </aside>
+ </div>
+</main>
+<footer>AI SMART MEDIA USA · Studio V2. Local editing and WebM export are browser features. Trend research, cloud AI generation, natural AI voice and automatic YouTube publishing require secure external connections and are not active until connected.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const canvas=$('stage'),ctx=canvas.getContext('2d');
+let clips=[],selected=0,musicUrl=null,voiceUrl=null,exportBlob=null,previewTimer=null;
+let activeVideo=null;
+function dimensions(){const v=$('ratio').value;return v==='portrait'?[720,1280]:v==='square'?[900,900]:[1280,720]}
+function setCanvas(){const [w,h]=dimensions();canvas.width=w;canvas.height=h;$('ratioLabel').textContent=$('ratio').selectedOptions[0].text;drawSelected()}
+function fitDraw(media,w,h){const mw=media.videoWidth||media.naturalWidth||media.width||1,mh=media.videoHeight||media.naturalHeight||media.height||1;const scale=Math.max(w/mw,h/mh),dw=mw*scale,dh=mh*scale;ctx.drawImage(media,(w-dw)/2,(h-dh)/2,dw,dh)}
+function drawOverlay(){
+ const w=canvas.width,h=canvas.height;
+ const grad=ctx.createLinearGradient(0,h*.52,0,h);grad.addColorStop(0,'rgba(1,7,18,0)');grad.addColorStop(1,'rgba(1,7,18,.88)');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+ const head=$('headline').value.trim(),cap=$('caption').value.trim(),brand=$('brandText').value.trim(),sub=$('subtitleText').value.trim();
+ ctx.textAlign='left';ctx.shadowColor='#000';ctx.shadowBlur=10;
+ ctx.fillStyle='#48baff';ctx.font=`800 ${Math.max(18,w*.025)}px system-ui`;ctx.fillText(brand.toUpperCase(),w*.06,h*.78);
+ ctx.fillStyle='#fff';ctx.font=`900 ${Math.max(28,w*.052)}px system-ui`;wrapText(head,w*.06,h*.86,w*.88,Math.max(34,w*.06));
+ ctx.fillStyle='#dce9ff';ctx.font=`500 ${Math.max(17,w*.023)}px system-ui`;wrapText(cap,w*.06,h*.94,w*.88,Math.max(23,w*.032));
+ if(sub){ctx.textAlign='center';ctx.font=`700 ${Math.max(17,w*.024)}px system-ui`;const lines=sub.split('\n').slice(0,3);const lineH=Math.max(22,h*.032);const boxH=lines.length*lineH+20;ctx.fillStyle='rgba(0,0,0,.78)';ctx.fillRect(w*.06,h*.62,w*.88,boxH);ctx.fillStyle='#fff';lines.forEach((line,i)=>ctx.fillText(line.slice(0,110),w/2,h*.62+lineH*(i+1)));}
+ ctx.shadowBlur=0;
+ ctx.fillStyle='#ef3340';ctx.fillRect(w*.06,h*.055,w*.13,Math.max(5,h*.009));
+}
+function wrapText(text,x,y,maxWidth,lineHeight){if(!text)return;const words=text.split(/\s+/);let line='',yy=y;for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){ctx.fillText(line,x,yy);line=word;yy+=lineHeight;}else line=test;}if(line)ctx.fillText(line,x,yy);}
+function drawBackground(){const w=canvas.width,h=canvas.height;const g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,'#071a38');g.addColorStop(.55,'#102f60');g.addColorStop(1,'#080e1b');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.strokeStyle='rgba(68,169,255,.18)';for(let i=0;i<10;i++){ctx.beginPath();ctx.arc(w*.78,h*.35,Math.min(w,h)*(.08+i*.055),0,Math.PI*2);ctx.stroke();}ctx.fillStyle='#4fc8ff';ctx.font=`900 ${Math.max(26,w*.055)}px system-ui`;ctx.textAlign='center';ctx.fillText('AI SMART MEDIA USA',w/2,h*.43);ctx.fillStyle='#d9e9ff';ctx.font=`500 ${Math.max(14,w*.022)}px system-ui`;ctx.fillText('ADD YOUR PHOTOS OR VIDEOS TO START',w/2,h*.52);}
+function drawSelected(){ctx.clearRect(0,0,canvas.width,canvas.height);const c=clips[selected];if(!c){drawBackground();return;}if(c.type==='image'&&c.el?.complete){fitDraw(c.el,canvas.width,canvas.height);}else if(c.type==='video'&&c.el?.readyState>=2){fitDraw(c.el,canvas.width,canvas.height);}else{drawBackground();}drawOverlay();}
+function updateList(){const list=$('clipList');list.innerHTML='';if(!clips.length){list.innerHTML='<div class="hint">No media added yet.</div>';return;}clips.forEach((c,i)=>{const item=document.createElement('div');item.className='clip';const th=document.createElement('div');th.className='thumb';if(c.type==='image'){const im=document.createElement('img');im.src=c.url;th.appendChild(im)}else th.textContent=c.type==='video'?'VIDEO':'TITLE';const info=document.createElement('div');info.className='clipinfo';const b=document.createElement('b');b.textContent=c.name;const sm=document.createElement('small');sm.textContent=(i+1)+' · '+c.type;info.append(b,sm);const sel=document.createElement('button');sel.className='secondary';sel.textContent=i===selected?'Selected':'Open';sel.onclick=()=>{selected=i;drawSelected();updateList()};const up=document.createElement('button');up.className='secondary';up.textContent='↑';up.disabled=i===0;up.onclick=()=>move(i,-1);const down=document.createElement('button');down.className='secondary';down.textContent='↓';down.disabled=i===clips.length-1;down.onclick=()=>move(i,1);const del=document.createElement('button');del.className='danger';del.textContent='×';del.onclick=()=>removeClip(i);item.append(th,info,sel,up,down,del);list.appendChild(item)});$('clipCount').textContent=clips.length+' media item'+(clips.length===1?'':'s')}
+function move(i,d){const j=i+d;if(j<0||j>=clips.length)return;[clips[i],clips[j]]=[clips[j],clips[i]];selected=j;updateList();drawSelected()}
+function removeClip(i){const c=clips[i];URL.revokeObjectURL(c.url);clips.splice(i,1);selected=Math.max(0,Math.min(selected,clips.length-1));updateList();drawSelected()}
+$('mediaInput').addEventListener('change',e=>{for(const f of e.target.files){const type=f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':null;if(!type)continue;const url=URL.createObjectURL(f),c={id:Date.now()+Math.random(),file:f,url,type,name:f.name,el:null};if(type==='image'){const im=new Image();im.onload=()=>{c.el=im;if(clips[selected]===c)drawSelected()};im.src=url;c.el=im;}else{const v=document.createElement('video');v.src=url;v.muted=true;v.playsInline=true;v.preload='metadata';v.onloadedmetadata=()=>{c.duration=v.duration||4};c.el=v;}clips.push(c);}selected=Math.max(0,clips.length-1);updateList();drawSelected();$('status').textContent='Media added. Select a clip to preview it.';e.target.value='';});
+$('clearBtn').onclick=()=>{clips.forEach(c=>URL.revokeObjectURL(c.url));clips=[];selected=0;updateList();drawSelected()};
+$('addCardBtn').onclick=()=>{clips.push({id:Date.now(),type:'title',name:'Title card',url:'',el:null,duration:4});selected=clips.length-1;updateList();drawSelected()};
+$('prevBtn').onclick=()=>{if(clips.length){selected=(selected-1+clips.length)%clips.length;updateList();drawSelected()}};
+$('nextBtn').onclick=()=>{if(clips.length){selected=(selected+1)%clips.length;updateList();drawSelected()}};
+$('applyTextBtn').onclick=drawSelected;
+$('clearTextBtn').onclick=()=>{$('headline').value='';$('caption').value='';drawSelected()};
+$('ratio').onchange=setCanvas;
+$('previewBtn').onclick=async()=>{if(!clips.length){$('status').textContent='Add media first.';return;}const c=clips[selected];if(c.type==='video'){const v=c.el;v.muted=true;try{await v.play();$('status').textContent='Playing selected video preview.';v.onended=()=>{$('status').textContent='Preview finished.'}}catch(e){$('status').textContent='Tap the video clip again to preview.'}}else{$('status').textContent='Preview updated on the canvas.';drawSelected()}};
+$('scriptBtn').onclick=()=>{const t=$('topic').value.trim()||'AI and technology';$('script').value=`Welcome to AI Smart Media USA.\\n\\nToday, we are looking at ${t}. Artificial intelligence is changing how people learn, work, communicate, and create. New tools can help people organize information and complete tasks, but results should always be checked.\\n\\nResponsible AI use matters. Protect personal information, verify important claims, and keep human judgment involved.\\n\\nFollow AI Smart Media USA for more technology updates and informative videos. Thanks for watching!`;$('voiceText').value=$('script').value;$('caption').value=t.toUpperCase();drawSelected()};
+function loadVoices(){if(!('speechSynthesis'in window))return;const sel=$('voiceChoice'),old=sel.value;const voices=speechSynthesis.getVoices();sel.innerHTML='<option value="">Device default voice</option>';voices.forEach((v,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=v.name+' ('+v.lang+')';sel.appendChild(o)});if(old)sel.value=old;}
+if('speechSynthesis'in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+function applyProfile(){const india=$('channelProfile').value==='india';$('voiceLocale').value=india?'hi-IN':'en-US';$('subtitleLanguage').value=india?'en':'en';if(india){$('voiceText').value=$('script').value;}else{$('voiceText').value=$('script').value;}drawSelected();}
+$('applyProfileBtn').onclick=applyProfile;
+$('channelProfile').onchange=applyProfile;
+$('subtitleText').addEventListener('input',drawSelected);
+$('clearSubtitleBtn').onclick=()=>{$('subtitleText').value='';drawSelected()};
+$('speakBtn').onclick=()=>{if(!('speechSynthesis'in window)){alert('Text-to-speech is not available in this browser.');return;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance($('voiceText').value);u.lang=$('voiceLocale').value;u.rate=1;u.pitch=1;const voices=speechSynthesis.getVoices();const idx=$('voiceChoice').value;if(idx!==''&&voices[Number(idx)])u.voice=voices[Number(idx)];else{const candidates=voices.filter(v=>v.lang.toLowerCase().startsWith(u.lang.toLowerCase()));const style=$('voiceStyle').value;if(style!=='any'){const match=candidates.find(v=>style==='female'?/female|woman|zira|samantha|susan|aria|jenny/i.test(v.name):/male|man|david|mark|guy|ryan/i.test(v.name));if(match)u.voice=match;}if(!u.voice&&candidates[0])u.voice=candidates[0];}speechSynthesis.speak(u)};
+$('stopSpeakBtn').onclick=()=>{if('speechSynthesis'in window)speechSynthesis.cancel()};
+$('voiceInput').onchange=e=>{if(voiceUrl)URL.revokeObjectURL(voiceUrl);const f=e.target.files[0];voiceUrl=f?URL.createObjectURL(f):null;$('exportStatus').textContent=f?'Narration selected: '+f.name:'No narration selected.'};
+$('musicInput').onchange=e=>{if(musicUrl)URL.revokeObjectURL(musicUrl);const f=e.target.files[0];musicUrl=f?URL.createObjectURL(f):null;$('exportStatus').textContent=f?'Music selected: '+f.name:'No music selected.'};
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+async function exportVideo(){
+ if(!clips.length){$('exportStatus').textContent='Please add photos or video clips first.';return;}
+ if(!canvas.captureStream||!window.MediaRecorder){$('exportStatus').textContent='Video export is not supported in this browser. Try the latest Chrome browser.';return;}
+ $('exportBtn').disabled=true;$('downloadBtn').disabled=true;exportBlob=null;
+ let stream=canvas.captureStream(30),audioCtx=null,musicEl=null,voiceEl=null,musicNode=null,voiceNode=null;
+ try{
+  if(musicUrl||voiceUrl){
+   audioCtx=new (window.AudioContext||window.webkitAudioContext)();const dest=audioCtx.createMediaStreamDestination();
+   if(musicUrl){musicEl=new Audio(musicUrl);musicEl.loop=true;musicNode=audioCtx.createMediaElementSource(musicEl);const mg=audioCtx.createGain();mg.gain.value=.20;musicNode.connect(mg);mg.connect(dest);}
+   if(voiceUrl){voiceEl=new Audio(voiceUrl);voiceNode=audioCtx.createMediaElementSource(voiceEl);const vg=audioCtx.createGain();vg.gain.value=1;voiceNode.connect(vg);vg.connect(dest);}
+   dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));await audioCtx.resume();
+  }
+  const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
+  if(!mime)throw new Error('This browser cannot record WebM video.');
+  const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:4500000});const chunks=[];
+  recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  const done=new Promise((resolve,reject)=>{recorder.onstop=()=>resolve();recorder.onerror=()=>reject(new Error('Recording failed.'))});
+  recorder.start(500);if(musicEl){try{await musicEl.play()}catch(e){}}if(voiceEl){try{await voiceEl.play()}catch(e){}}
+  const fade=async(from,to,ms)=>{const start=performance.now();return new Promise(resolve=>{function tick(now){const p=Math.min(1,(now-start)/ms);ctx.save();ctx.globalAlpha=from+(to-from)*p;ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.restore();if(p<1)requestAnimationFrame(tick);else resolve()}requestAnimationFrame(tick)})};
+  for(let i=0;i<clips.length;i++){
+   selected=i;updateList();const c=clips[i];$('exportStatus').textContent=`Rendering scene ${i+1} of ${clips.length}…`;
+   await fade(1,0,220);
+   if(c.type==='video'){
+    const v=document.createElement('video');v.src=c.url;v.playsInline=true;v.preload='auto';v.muted=true;await new Promise((res,rej)=>{v.onloadedmetadata=res;v.onerror=()=>rej(new Error('Could not read video '+c.name))});
+    const dur=Math.min(Math.max(v.duration||4,1),90);await v.play().catch(()=>{});const start=performance.now();
+    await new Promise(resolve=>{function frame(){ctx.clearRect(0,0,canvas.width,canvas.height);if(v.readyState>=2)fitDraw(v,canvas.width,canvas.height);else drawBackground();drawOverlay();if(v.ended||performance.now()-start>=dur*1000){v.pause();resolve()}else requestAnimationFrame(frame)}frame()});
+    v.remove();
+   }else{
+    drawSelected();await fade(1,0,220);await wait(Number($('duration').value)*1000);await fade(0,1,220);
+   }
+   if(i<clips.length-1)await fade(0,1,220);
+  }
+  if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();recorder.stop();await done;exportBlob=new Blob(chunks,{type:mime});const url=URL.createObjectURL(exportBlob);$('downloadBtn').disabled=false;$('downloadBtn').onclick=()=>{const a=document.createElement('a');a.href=url;a.download='AI-SMART-MEDIA-USA-video.webm';a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>{if(document.visibilityState==='visible')$('exportStatus').textContent='If download did not start, open this page on its HTTPS website (not a content:// local file) and try again.'},1200)};$('exportStatus').textContent='Export ready. Tap Download export to save your WebM video.';
+ }catch(err){$('exportStatus').textContent='Export issue: '+err.message+' Try fewer clips or a shorter video.'}
+ finally{if(musicEl)musicEl.pause();if(voiceEl)voiceEl.pause();if(audioCtx)audioCtx.close();$('exportBtn').disabled=false;drawSelected()}
+}
+$('exportBtn').onclick=exportVideo;
+$('trendPlanBtn').onclick=()=>{const topic=$('trendNotes').value.trim();if(!topic){$('trendBrief').textContent='Please enter a topic or trend note first.';return;}const cat=$('trendCategory').value,region=$('trendRegion').value;$('topic').value=topic;$('trendBrief').innerHTML='';const lines=[`Category: ${cat}`,`Audience: ${region}`,`Topic: ${topic}`,`Next: verify the latest facts from trustworthy sources, identify the audience angle, then create an original script.`];lines.forEach(t=>{const d=document.createElement('div');d.textContent=t;$('trendBrief').appendChild(d)});};
+function updateChecks(){const boxes=[...document.querySelectorAll('.pkg')];const n=boxes.filter(b=>b.checked).length;$('checkStatus').textContent=`${n} of ${boxes.length} checks complete.`}document.querySelectorAll('.pkg').forEach(b=>b.addEventListener('change',updateChecks));
+$('savePlanBtn').onclick=()=>{const plan={title:$('ytTitle').value,description:$('ytDescription').value,tags:$('ytTags').value,time:$('publishTime').value,frequency:$('publishDays').value};try{localStorage.setItem('aism_publish_plan',JSON.stringify(plan));$('planStatus').textContent='Publishing plan saved on this device.'}catch(e){$('planStatus').textContent='Could not save on this browser.'}};
+drawBackground();
+</script>
+</body>
+</html>
