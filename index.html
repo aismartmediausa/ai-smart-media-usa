@@ -260,36 +260,64 @@ $('musicInput').onchange=e=>{if(musicUrl)URL.revokeObjectURL(musicUrl);const f=e
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 async async function exportVideo(){
  if(!clips.length){$('exportStatus').textContent='Add photos or videos first.';return;}
- if(!canvas.captureStream||!window.MediaRecorder){$('exportStatus').textContent='This browser cannot export video. Use updated Chrome.';return;}
+ if(!canvas.captureStream||!window.MediaRecorder){$('exportStatus').textContent='Video export is not supported in this browser.';return;}
  $('exportBtn').disabled=true;$('downloadBtn').disabled=true;exportBlob=null;
  let stream=null,rec=null,raf=0;
  try{
-  drawSelected();await wait(250);
-  stream=canvas.captureStream(30);
-  const track=stream.getVideoTracks()[0];
-  const mime=['video/webm;codecs=vp8','video/webm;codecs=vp9','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));
-  if(!mime)throw new Error('WebM format is not supported on this phone.');
-  const chunks=[];rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000});
-  rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-  const done=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=()=>reject(new Error('Recorder failed'))});
-  rec.start(250);
-  const keepAlive=()=>{if(track&&track.requestFrame)track.requestFrame();raf=requestAnimationFrame(keepAlive)};keepAlive();
-  for(let i=0;i<clips.length;i++){
-   selected=i;updateList();const c=clips[i];$('exportStatus').textContent='Rendering '+(i+1)+' / '+clips.length;
-   if(c.type==='image'){
-    if(!c.el||!c.el.complete||!c.el.naturalWidth)await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{c.el=im;resolve()};im.onerror=()=>reject(new Error('Image load failed: '+c.name));im.src=c.url});
-    drawSelected();await wait(180);if(track&&track.requestFrame)track.requestFrame();await wait(Math.max(1,Number($('duration').value)||4)*1000);
-   }else if(c.type==='video'){
-    const v=document.createElement('video');v.src=c.url;v.muted=true;v.playsInline=true;v.preload='auto';
-    await new Promise((resolve,reject)=>{v.onloadeddata=resolve;v.onerror=()=>reject(new Error('Video load failed: '+c.name));v.load()});
-    await v.play();await new Promise(resolve=>{const draw=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);fitDraw(v,canvas.width,canvas.height);drawOverlay();if(track&&track.requestFrame)track.requestFrame();if(v.ended)resolve();else requestAnimationFrame(draw)};draw()});
-    v.pause();v.removeAttribute('src');v.load();
-   }else{drawBackground();drawOverlay();await wait(3500)}
+  const trackCanvas=canvas;
+  async function readyImage(c){
+   if(c.el && c.el.complete && c.el.naturalWidth>0)return c.el;
+   const im=new Image();im.decoding='async';im.src=c.url;
+   if(im.decode)await im.decode();else await new Promise((ok,no)=>{im.onload=ok;im.onerror=()=>no(new Error('Could not load '+c.name))});
+   if(!im.naturalWidth)throw new Error('Image is empty: '+c.name);
+   c.el=im;return im;
   }
-  await wait(500);cancelAnimationFrame(raf);raf=0;rec.stop();await done;
-  exportBlob=new Blob(chunks,{type:mime});if(!exportBlob.size)throw new Error('Export file is empty.');
-  const url=URL.createObjectURL(exportBlob);$('downloadBtn').disabled=false;$('downloadBtn').onclick=()=>{const link=document.createElement('a');link.href=url;link.download='AI-SMART-MEDIA-USA-video.webm';document.body.appendChild(link);link.click();link.remove()};
-  $('exportStatus').textContent='Video ready ('+Math.round(exportBlob.size/1024)+' KB). Tap Download export.';
+  async function renderClip(c){
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+   if(c.type==='image'){
+    const im=await readyImage(c);
+    fitDraw(im,canvas.width,canvas.height);
+   }else if(c.type==='video'){
+    const v=c.el;
+    if(!v || v.readyState<2)throw new Error('Video is not ready: '+c.name);
+    fitDraw(v,canvas.width,canvas.height);
+   }else{
+    drawBackground();
+   }
+   drawOverlay();
+  }
+  stream=trackCanvas.captureStream(30);
+  const mime=['video/webm;codecs=vp8','video/webm;codecs=vp9','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));
+  if(!mime)throw new Error('WebM recording is not supported by this browser.');
+  const chunks=[];
+  rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3000000});
+  rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  const finished=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=()=>reject(new Error('Browser video recorder failed.'))});
+  await renderClip(clips[0]);await wait(350);
+  rec.start(250);
+  const tick=()=>{raf=requestAnimationFrame(tick);if(stream.getVideoTracks()[0]?.requestFrame)stream.getVideoTracks()[0].requestFrame()};
+  tick();
+  for(let i=0;i<clips.length;i++){
+   selected=i;updateList();
+   const c=clips[i];
+   $('exportStatus').textContent='Rendering scene '+(i+1)+' of '+clips.length+'…';
+   await renderClip(c);
+   if(stream.getVideoTracks()[0]?.requestFrame)stream.getVideoTracks()[0].requestFrame();
+   if(c.type==='video'){
+    const v=c.el;
+    await wait(Math.max(1000,Math.min(15000,(v.duration||4)*1000)));
+   }else{
+    await wait(Math.max(1,Number($('duration').value)||4)*1000);
+   }
+  }
+  await wait(350);cancelAnimationFrame(raf);raf=0;
+  rec.stop();await finished;
+  exportBlob=new Blob(chunks,{type:mime});
+  if(!exportBlob.size)throw new Error('The exported video is empty.');
+  const url=URL.createObjectURL(exportBlob);
+  $('downloadBtn').disabled=false;
+  $('downloadBtn').onclick=()=>{const link=document.createElement('a');link.href=url;link.download='AI-SMART-MEDIA-USA-video.webm';document.body.appendChild(link);link.click();link.remove()};
+  $('exportStatus').textContent='Video ready: '+Math.round(exportBlob.size/1024)+' KB. Tap Download export.';
  }catch(e){$('exportStatus').textContent='Export failed: '+e.message}
  finally{cancelAnimationFrame(raf);if(stream)stream.getTracks().forEach(t=>t.stop());$('exportBtn').disabled=false;drawSelected()}
 }
