@@ -265,7 +265,7 @@ async function exportVideo(){
  let stream=null,audioCtx=null,musicEl=null,voiceEl=null,framePump=null;
  try{
   const paint=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);drawBackground();const c=clips[selected];if(c&&c.type==='image'&&c.el&&c.el.complete&&c.el.naturalWidth>0)fitDraw(c.el,canvas.width,canvas.height);else if(c&&c.type==='video'&&c.el&&c.el.readyState>=2)fitDraw(c.el,canvas.width,canvas.height);drawOverlay();};
-  paint();stream=canvas.captureStream(0);
+  paint();stream=canvas.captureStream(30);
   const videoTrack=stream.getVideoTracks()[0];
   const requestFrame=()=>{if(videoTrack&&typeof videoTrack.requestFrame==='function')videoTrack.requestFrame()};
   requestFrame();
