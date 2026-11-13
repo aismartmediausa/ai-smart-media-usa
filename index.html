@@ -258,7 +258,7 @@ $('stopSpeakBtn').onclick=()=>{if('speechSynthesis'in window)speechSynthesis.can
 $('voiceInput').onchange=e=>{if(voiceUrl)URL.revokeObjectURL(voiceUrl);const f=e.target.files[0];voiceUrl=f?URL.createObjectURL(f):null;$('exportStatus').textContent=f?'Narration selected: '+f.name:'No narration selected.'};
 $('musicInput').onchange=e=>{if(musicUrl)URL.revokeObjectURL(musicUrl);const f=e.target.files[0];musicUrl=f?URL.createObjectURL(f):null;$('exportStatus').textContent=f?'Music selected: '+f.name:'No music selected.'};
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
-async function exportVideo(){
+async async function exportVideo(){
  if(!clips.length){$('exportStatus').textContent='Add photos or videos first.';return;}
  if(!canvas.captureStream||!window.MediaRecorder){$('exportStatus').textContent='This browser cannot export video. Use updated Chrome.';return;}
  $('exportBtn').disabled=true;$('downloadBtn').disabled=true;exportBlob=null;
