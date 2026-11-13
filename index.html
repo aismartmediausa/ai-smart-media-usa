@@ -278,7 +278,7 @@ async async function exportVideo(){
    selected=i;updateList();const c=clips[i];$('exportStatus').textContent='Rendering '+(i+1)+' / '+clips.length;
    if(c.type==='image'){
     if(!c.el||!c.el.complete||!c.el.naturalWidth)await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{c.el=im;resolve()};im.onerror=()=>reject(new Error('Image load failed: '+c.name));im.src=c.url});
-    drawSelected();if(track&&track.requestFrame)track.requestFrame();await wait(Math.max(1,Number($('duration').value)||4)*1000);
+    drawSelected();await wait(180);if(track&&track.requestFrame)track.requestFrame();await wait(Math.max(1,Number($('duration').value)||4)*1000);
    }else if(c.type==='video'){
     const v=document.createElement('video');v.src=c.url;v.muted=true;v.playsInline=true;v.preload='auto';
     await new Promise((resolve,reject)=>{v.onloadeddata=resolve;v.onerror=()=>reject(new Error('Video load failed: '+c.name));v.load()});
