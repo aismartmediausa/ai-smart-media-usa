@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#071225">
 <title>AI SMART MEDIA — International Video Studio</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="description" content="AI SMART MEDIA USA mobile creator studio for scripts, captions, media editing and YouTube preparation.">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
 <style>
 :root{--bg:#07101f;--panel:#101d31;--panel2:#14243c;--line:#263b5c;--text:#f4f7ff;--muted:#9fb0ca;--blue:#2785ff;--red:#ef3340;--cyan:#49d7ff}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0%,#142b50 0,#07101f 42%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -306,6 +309,21 @@ $('downloadProjectBtn').onclick=()=>{const data={brand:'AI SMART MEDIA USA',crea
 $('downloadSrtBtn').onclick=()=>{const lines=$('subtitleText').value.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean);if(!lines.length){$('exportStatus').textContent='Pehle subtitle text enter kijiye.';return;}const srt=lines.map((line,i)=>{const start=i*4,end=start+4,stamp=n=>{const h=String(Math.floor(n/3600)).padStart(2,'0'),m=String(Math.floor(n%3600/60)).padStart(2,'0'),s=String(n%60).padStart(2,'0');return h+':'+m+':'+s+',000'};return (i+1)+'\\n'+stamp(start)+' --> '+stamp(end)+'\\n'+line}).join('\\n\\n');downloadText('AI-SMART-MEDIA-USA-subtitles.srt',srt)};
 
 drawBackground();
+let draftSaveTimer;
+function autoSaveStudioDraft(){
+ clearTimeout(draftSaveTimer);
+ draftSaveTimer=setTimeout(()=>{
+  try{
+   const d={topic:$('topic').value,script:$('script').value,format:$('scriptFormat').value,language:$('scriptLanguage').value,headline:$('headline').value,caption:$('caption').value,voiceText:$('voiceText').value,subtitleText:$('subtitleText').value,subtitleLanguage:$('subtitleLanguage').value,updatedAt:new Date().toISOString()};
+   localStorage.setItem('aism_creator_draft',JSON.stringify(d));
+   $('scriptStatus').textContent='Auto-saved on this phone.';
+  }catch(e){}
+ },700);
+}
+['topic','script','scriptFormat','scriptLanguage','headline','caption','voiceText','subtitleText','subtitleLanguage'].forEach(id=>$(id).addEventListener('input',autoSaveStudioDraft));
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+ navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
